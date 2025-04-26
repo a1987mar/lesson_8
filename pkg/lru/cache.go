@@ -12,7 +12,7 @@ type node struct {
 	prev, next *node
 }
 
-type casheL struct {
+type casheLru struct {
 	capac int
 	items map[string]*node
 	head  *node
@@ -20,13 +20,13 @@ type casheL struct {
 }
 
 func NewLruCache(capacity int) LruCache {
-	return &casheL{
+	return &casheLru{
 		capac: capacity,
 		items: make(map[string]*node),
 	}
 }
 
-func (l *casheL) Put(key, value string) {
+func (l *casheLru) Put(key, value string) {
 	if n, ok := l.items[key]; ok {
 		n.value = value
 		l.moveFront(n)
@@ -40,7 +40,7 @@ func (l *casheL) Put(key, value string) {
 	}
 }
 
-func (l *casheL) Get(key string) (string, bool) {
+func (l *casheLru) Get(key string) (string, bool) {
 	if n, ok := l.items[key]; ok {
 		l.moveFront(n)
 		return n.value, true
@@ -48,7 +48,7 @@ func (l *casheL) Get(key string) (string, bool) {
 	return "", false
 }
 
-func (l *casheL) add(n *node) {
+func (l *casheLru) add(n *node) {
 	n.next = l.head
 	if l.head != nil {
 		l.head.prev = n
@@ -59,7 +59,7 @@ func (l *casheL) add(n *node) {
 	}
 }
 
-func (l *casheL) removeNode(n *node) {
+func (l *casheLru) removeNode(n *node) {
 	if n.prev != nil {
 		n.prev.next = n.next
 	} else {
@@ -74,7 +74,7 @@ func (l *casheL) removeNode(n *node) {
 	n.next = nil
 }
 
-func (l *casheL) removeTail() {
+func (l *casheLru) removeTail() {
 	if l.tail == nil {
 		return
 	}
@@ -82,7 +82,7 @@ func (l *casheL) removeTail() {
 	l.removeNode(l.tail)
 }
 
-func (l *casheL) moveFront(n *node) {
+func (l *casheLru) moveFront(n *node) {
 	if l.head == n {
 		return
 	}
